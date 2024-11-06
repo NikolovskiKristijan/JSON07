@@ -37,13 +37,69 @@ document.addEventListener('DOMContentLoaded', function (){
 
     let allCardsHTML = data.map(book => {
         if(!book.copertina || !book.title || !book.autore) {
-
+            console.log('book data in  incomplete', book);
+            return '';
         }
-    });
+        return createCardHTML(book);
+    }).join('');
 
+    container.insertAdjacentHTML('beforeend', allCardsHTML);
+
+    createGenreSwitches(data);
 });
+//-------------------------------------------------------------------------------------------
 
+function filterByProperty(propertyName, value) {
+    if(!Array.isArray(data)){
+        console.error('Invalid data: expected an array of books');
+        return;
+    }
+    const filteredData = data.filter(book => book[propertyName] && book[propertyName] === value);
+    displayBooks(filteredData);
+}
 
+//--------------------------------------------------------------------------------------------
+
+function displayBooks(filteredData) {
+    console.log(filteredData);
+    const container = document.getElementById('cards-container');
+
+    container.innerHTML = "";
+    filteredData.forEach(book => {
+        const htmlContent = createCardHTML(book);
+        container.insertAdjacentHTML('beforeend', htmlContent);
+    })
+}
+//------------------------------------------------------------------------------------------------
+
+let debounceTimeout;
+
+function searchBooks() {
+    const searchBox = document.getElementById('searchBox');
+    if(!searchBox){
+        console.error('Search box element non found');
+        return;
+    }
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() =>{
+        const searchTerm = searchBox.value.trim().toLowerCase();
+        let filteredData;
+        if(searchTerm) {
+            filteredData =  data.filter(book =>
+                book.titolo.toLowerCase().includes(searchTerm) ||
+                book.autore.toLowerCase().includes(searchTerm)
+            );
+        }else {
+            filteredData = data;
+        }
+        displayBooks(filteredData);
+    }, 300);
+}
+//--------------------------------------------------------------------------------------------------
+
+function openEditModal(bookId) {
+    const book = data.find(b =>b.id === bookId)
+}
 
 
 
